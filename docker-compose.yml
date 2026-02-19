@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  analyzer:
+    image: thesecureanalyzerx:latest
+    build: ./core-ai-analyzer
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./core-ai-analyzer:/app
+    networks:
+      - securex-mesh
+
+  cloner:
+    image: thesecureclonex:latest
+    build: ./modules/TheSecureCloneX
+    networks:
+      - securex-mesh
+
+  remote:
+    image: theremotex:latest
+    build: ./modules/TheRemoteX
+    networks:
+      - securex-mesh
+
+  log-parser:
+    image: thelogx:latest
+    build: ./modules/TheLogX
+    networks:
+      - securex-mesh
+
+  net-protect:
+    image: thenetprotectx:latest
+    build: ./modules/TheNetProtectX
+    networks:
+      - securex-mesh
+
+networks:
+  securex-mesh:
+    driver: bridge
