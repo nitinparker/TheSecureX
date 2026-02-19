@@ -1,48 +1,71 @@
 version: '3.8'
 
 services:
-  portal:
-    build: ./portal-gateway
-    command: python run.py
+  # 1. Java Portal Gateway (Spring Boot)
+  portal-gateway:
+    build: 
+      context: ./portal-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/securex_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=securex_root
+    depends_on:
+      - db
+    networks:
+      - securex-mesh
+
+  # 2. Python AI Engine (FastAPI)
+  ai-engine:
+    build: 
+      context: ./ai-engine
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./portal-gateway:/app
-    networks:
-      - securex-mesh
-
-  analyzer:
-    image: thesecureanalyzerx:latest
-    build: ./core-ai-analyzer
-    networks:
-      - securex-mesh
+    environment:
+      - DATABASE_URL=postgresql://postgres:securex_root@db:5432/securex_db
     depends_on:
-      - portal
-
-  cloner:
-    image: thesecureclonex:latest
-    build: ./modules/TheSecureCloneX
+      - db
     networks:
       - securex-mesh
 
-  remote:
-    image: theremotex:latest
-    build: ./modules/TheRemoteX
+  # 3. Go Network Tools (TheNetProtectX)
+  network-tools:
+    build: 
+      context: ./network-tools
+      dockerfile: Dockerfile
+    # Network tools often need host networking or capabilities
+    cap_add:
+      - NET_ADMIN
     networks:
       - securex-mesh
 
-  log-parser:
-    image: thelogx:latest
-    build: ./modules/TheLogX
+  # 4. Database (PostgreSQL)
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=securex_root
+      - POSTGRES_DB=securex_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - securex-mesh
 
-  net-protect:
-    image: thenetprotectx:latest
-    build: ./modules/TheNetProtectX
+  # 5. Message Broker (RabbitMQ)
+  broker:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - securex-mesh
 
 networks:
   securex-mesh:
     driver: bridge
+
+volumes:
+  postgres_data:

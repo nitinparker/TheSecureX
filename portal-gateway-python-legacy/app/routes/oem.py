@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from .. import models, schemas, auth
+from .. import schemas, auth
 from ..database import SessionLocal
+from ..oem_logic import generate_secure_invite
 
 router = APIRouter()
 
@@ -17,13 +17,10 @@ def get_db():
 @router.post("/generate-invite", response_model=str)
 def generate_invite(invite: schemas.InviteCodeCreate, db: Session = Depends(get_db)):
     # In real app, check if current user is OEM
-    expires = datetime.utcnow() + timedelta(days=invite.days_valid)
-    new_invite = models.InviteCode(
-        role_to_assign=invite.role_to_assign,
-        target_group_id=invite.target_group_id,
-        expires_at=expires
+    result = generate_secure_invite(
+        db=db,
+        role=invite.role_to_assign,
+        group_id=invite.target_group_id,
+        days_valid=invite.days_valid
     )
-    db.add(new_invite)
-    db.commit()
-    db.refresh(new_invite)
-    return new_invite.code
+    return result["invite_code"]

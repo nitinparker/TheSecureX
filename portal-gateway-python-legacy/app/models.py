@@ -29,7 +29,7 @@ class AccessGroup(Base):
     
     # Relationships
     tools = relationship("Tool", secondary=group_tool_association)
-    members = relationship("User", back_populates="access_group")
+    members = relationship("User", back_populates="access_group", foreign_keys="[User.access_group_id]")
 
 class User(Base):
     """Comprehensive User model covering OEM, Master, and End-User"""
@@ -46,7 +46,7 @@ class User(Base):
     
     # Linking to Access Groups
     access_group_id = Column(Integer, ForeignKey('access_groups.id'), nullable=True)
-    access_group = relationship("AccessGroup", back_populates="members")
+    access_group = relationship("AccessGroup", back_populates="members", foreign_keys=[access_group_id])
 
     # Tracking for OEM purposes
     created_at = Column(DateTime, default=datetime.utcnow)
