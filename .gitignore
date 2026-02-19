@@ -40,12 +40,25 @@ yarn-error.log
 .DS_Store
 Thumbs.db
 
-# Forensic Data (Too large for git)
+# Forensic Binaries (NEVER upload raw evidence)
 *.E01
 *.raw
 *.mem
+*.aff4
+*.pcap
 
-# ML Models
-*.pkl
+# AI/ML Artifacts
 *.h5
+*.tflite
+*.onnx
+/ai-engine/models/temp_weights/
+*.pkl
 *.models/
+
+# Security Sensitive
+*.key
+*.pem
+/vault/secrets/
+
+# Environment
+.env
