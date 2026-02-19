@@ -23,4 +23,8 @@ public class MasterGeoData {
     private String state;
     private String city;
     private String pincode;
+
+    private Double latitude;
+    private Double longitude;
+    private String locationName;
 }

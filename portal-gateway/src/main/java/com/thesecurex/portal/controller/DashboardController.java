@@ -36,7 +36,7 @@ public class DashboardController {
             return "redirect:/master/dashboard"; 
         } else { 
             // Standard User Launchpad 
-            model.addAttribute("myTools", userService.getToolsForUser(authentication.getName())); 
+            model.addAttribute("authorizedTools", userService.getToolsForUser(authentication.getName())); 
             return "user/launchpad"; 
         } 
     }

@@ -40,7 +40,7 @@
         <p class="text-muted mb-5">Select a module to begin evidence collection or analysis.</p> 
 
         <div class="row g-4"> 
-            <div class="col-md-4" th:each="tool : ${myTools}"> 
+            <div class="col-md-4" th:each="tool : ${authorizedTools}"> 
                 <div class="tool-card p-4"> 
                     <div class="d-flex align-items-center mb-3"> 
                         <div class="icon-box me-3">🛡️</div> 
@@ -51,7 +51,7 @@
                 </div> 
             </div> 
             
-            <div th:if="${#lists.isEmpty(myTools)}" class="col-12 text-center py-5"> 
+            <div th:if="${#lists.isEmpty(authorizedTools)}" class="col-12 text-center py-5"> 
                 <div class="alert alert-info">No tools assigned. Contact your Master Admin.</div> 
             </div> 
         </div> 

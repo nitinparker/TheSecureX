@@ -39,20 +39,14 @@ public class EvidenceVaultService {
         String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
         Path destinationFile = this.rootLocation.resolve(storedFileName);
 
-        // 2. Calculate SHA-256 Hash and Save File simultaneously
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream is = file.getInputStream();
-             OutputStream os = Files.newOutputStream(destinationFile)) {
-            
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = is.read(buffer)) > 0) {
-                digest.update(buffer, 0, read);
-                os.write(buffer, 0, read);
-            }
-        }
+    // 2. Calculate SHA-256 Hash and Save File simultaneously
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    try (InputStream is = file.getInputStream();
+         java.security.DigestOutputStream dos = new java.security.DigestOutputStream(Files.newOutputStream(destinationFile), digest)) {
+        is.transferTo(dos);
+    }
 
-        String hash = bytesToHex(digest.digest());
+    String hash = bytesToHex(digest.digest());
 
         // 3. Save Metadata to Database
         Evidence evidence = new Evidence();
