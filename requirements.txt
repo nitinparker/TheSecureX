@@ -3,3 +3,9 @@ pandas
 scikit-learn
 matplotlib
 jupyter
+fastapi
+uvicorn
+scapy
+flake8
+pytest
+requests
