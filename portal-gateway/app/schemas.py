@@ -6,10 +6,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class TokenData(BaseModel):
-    username: Optional[str] = None
-    permissions: List[str] = []
-
 class UserBase(BaseModel):
     username: str
     email: str
@@ -21,12 +17,17 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    access_groups: List[str] = []
+    role: str
+    access_group_id: Optional[int] = None
 
     class Config:
         orm_mode = True
 
-class InviteCreate(BaseModel):
-    group_name: str
-    org_name: str
+class InviteCodeCreate(BaseModel):
+    role_to_assign: str
+    target_group_id: Optional[int] = None
     days_valid: int = 7
+
+class AccessGroupCreate(BaseModel):
+    name: str
+    tool_ids: List[int] = []

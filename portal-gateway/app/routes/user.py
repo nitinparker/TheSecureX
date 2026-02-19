@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from ..models import database, models, schemas
-from . import security
 from fastapi.security import OAuth2PasswordRequestForm
+from .. import models, schemas, auth
+from ..database import SessionLocal
 
 router = APIRouter()
 
 def get_db():
-    db = database.SessionLocal()
+    db = SessionLocal()
     try:
         yield db
     finally:
@@ -31,18 +31,17 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username already registered")
 
     # 3. Create User
-    hashed_password = security.get_password_hash(user.password)
+    hashed_password = auth.get_password_hash(user.password)
     new_user = models.User(
         username=user.username,
         email=user.email,
-        hashed_password=hashed_password,
-        is_active=True
+        password_hash=hashed_password,
+        role=invite.role_to_assign,
+        invited_by_code=invite.code,
+        access_group_id=invite.target_group_id
     )
     
-    # 4. Assign Access Group from Invite
-    new_user.access_groups.append(invite.access_group)
-    
-    # 5. Mark Invite as Used
+    # 4. Mark Invite as Used
     invite.is_used = True
     
     db.add(new_user)
@@ -50,27 +49,23 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # 6. Generate Token
-    access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        data={"sub": new_user.username, "scopes": security.create_access_mask(new_user.access_groups)},
-        expires_delta=access_token_expires
+    # 5. Generate Token
+    access_token = auth.create_access_token(
+        data={"sub": new_user.username, "role": new_user.role}
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/token", response_model=schemas.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@router.post("/login", response_model=schemas.Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
+    if not user or not auth.verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        data={"sub": user.username, "scopes": security.create_access_mask(user.access_groups)},
-        expires_delta=access_token_expires
+    access_token = auth.create_access_token(
+        data={"sub": user.username, "role": user.role}
     )
     return {"access_token": access_token, "token_type": "bearer"}
