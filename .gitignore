@@ -1,39 +1,36 @@
-# Forensic Images & Raw Evidence
-**/evidence/**
-*.E01
-*.001
-*.raw
-*.vmem
-*.aff4
-*.pcap
-
-# Tool Logs & Temporary Dumps
-**/logs/*.log
-**/temp_dumps/
-
-# AI Model Checkpoints
-**/models/*.pth
-**/models/*.onnx
-*.h5
-*.tflite
-*.pkl
-
-# Security Sensitive
-*.key
-*.pem
-/vault/secrets/
-.env
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
 
 # Python
 __pycache__/
 *.py[cod]
-.venv/
-env/
+*$py.class
+venv/
+.env
+.pytest_cache/
+
+# Go
+network-tools/sniffer
+network-tools/go.sum
 
 # IDEs
-.vscode/
 .idea/
+.vscode/
+*.swp
+*.iml
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Database
+postgres_data/
+*.db

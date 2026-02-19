@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-passlib[argon2]
-python-jose[cryptography]
-pydantic[email]
-python-multipart
-argon2-cffi
-# psycopg2-binary # Uncomment for PostgreSQL
