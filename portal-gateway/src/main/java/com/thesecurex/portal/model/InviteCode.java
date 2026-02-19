@@ -24,7 +24,9 @@ public class InviteCode {
     @JoinColumn(name = "target_group_id")
     private AccessGroup targetGroup;
 
-    private boolean isUsed = false;
+    private boolean used = false;
 
-    private LocalDateTime expiry;
+    private LocalDateTime expiresAt;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -2,7 +2,9 @@ package com.thesecurex.portal.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -18,8 +20,22 @@ public class AccessGroup {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "master_id")
-    private Long masterId; // The Master who created this group
+    @ManyToOne
+    @JoinColumn(name = "master_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User master; // The Master who created this group
 
-    // In a real app, you'd have a ManyToMany relationship with Tools here
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "group_tool_mapping",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "tool_id")
+    )
+    private List<Tool> allowedTools;
+
+    @OneToMany(mappedBy = "accessGroup")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<User> members;
 }

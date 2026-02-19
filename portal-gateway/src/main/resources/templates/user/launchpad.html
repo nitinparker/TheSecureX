@@ -1,0 +1,60 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org"> 
+<head> 
+    <title>TheSecureX | Investigator Launchpad</title> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
+    <style> 
+        body { background-color: #f4f7f9; color: #33475b; } 
+        .navbar { background: white; border-bottom: 2px solid #eaf0f6; } 
+        .tool-card { 
+            background: white; border: 1px solid #eaf0f6; border-radius: 12px; 
+            transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; 
+        } 
+        .tool-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            border-color: #007bff; 
+        } 
+        .icon-box { 
+            width: 60px; height: 60px; background: #eef3ff; 
+            color: #007bff; border-radius: 12px; display: flex; 
+            align-items: center; justify-content: center; font-size: 1.5rem; 
+        } 
+        .btn-launch { background: #007bff; color: white; border-radius: 8px; width: 100%; } 
+    </style> 
+</head> 
+<body> 
+    <nav class="navbar navbar-light px-4 py-3"> 
+        <span class="navbar-brand fw-bold text-primary">TheSecureX Investigator</span> 
+        <div class="ms-auto d-flex align-items-center"> 
+            <div class="text-end me-3"> 
+                <div class="fw-bold" th:text="${#authentication.name}">Username</div> 
+                <small class="text-muted">Forensics Level 1</small> 
+            </div> 
+            <a th:href="@{/logout}" class="btn btn-sm btn-outline-danger">Logout</a> 
+        </div> 
+    </nav> 
+
+    <div class="container py-5"> 
+        <h3 class="mb-4">Authorized Forensic Modules</h3> 
+        <p class="text-muted mb-5">Select a module to begin evidence collection or analysis.</p> 
+
+        <div class="row g-4"> 
+            <div class="col-md-4" th:each="tool : ${myTools}"> 
+                <div class="tool-card p-4"> 
+                    <div class="d-flex align-items-center mb-3"> 
+                        <div class="icon-box me-3">🛡️</div> 
+                        <h5 class="mb-0" th:text="${tool.name}">Tool Name</h5> 
+                    </div> 
+                    <p class="small text-muted mb-4" th:text="${tool.description}">Module description goes here.</p> 
+                    <a th:href="@{'/tools/launch/' + ${tool.id}}" target="_blank" class="btn btn-launch">Launch Module</a> 
+                </div> 
+            </div> 
+            
+            <div th:if="${#lists.isEmpty(myTools)}" class="col-12 text-center py-5"> 
+                <div class="alert alert-info">No tools assigned. Contact your Master Admin.</div> 
+            </div> 
+        </div> 
+    </div> 
+</body> 
+</html>

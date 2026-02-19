@@ -1,0 +1,162 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org" lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>TheSecureX | OEM Command Center</title> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style> 
+        body { background-color: #f8f9fa; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; } 
+        
+        /* Navbar Styling */
+        .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 1030; } 
+        .navbar-brand { font-weight: 700; color: #1a252f; letter-spacing: 0.5px; }
+        
+        /* Sidebar Styling (Desktop) */
+        .sidebar { background-color: #1a252f; min-height: 100vh; color: #ecf0f1; box-shadow: 2px 0 5px rgba(0,0,0,0.1); } 
+        .sidebar .nav-link { color: #bdc3c7; font-weight: 500; padding: 12px 20px; border-radius: 5px; margin-bottom: 5px; transition: all 0.3s; } 
+        .sidebar .nav-link:hover { color: #ffffff; background-color: rgba(255,255,255,0.1); transform: translateX(5px); } 
+        .sidebar .nav-link.active { color: #ffffff; background-color: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.2); } 
+        .sidebar .nav-link i { width: 25px; text-align: center; margin-right: 10px; }
+
+        /* Offcanvas Styling (Mobile) */
+        .offcanvas-start { background-color: #1a252f; color: white; }
+        .offcanvas-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .offcanvas-title { font-weight: 700; letter-spacing: 1px; }
+        .btn-close-white { filter: invert(1); }
+
+        /* Cards & Content */
+        .card { border: none; border-radius: 10px; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); transition: transform 0.2s; } 
+        .card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); }
+        .text-primary { color: #1a73e8 !important; }
+        .stat-card-icon { font-size: 2rem; opacity: 0.2; position: absolute; top: 15px; right: 15px; }
+    </style> 
+</head> 
+<body> 
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top px-3"> 
+        <div class="container-fluid">
+            <!-- Mobile Toggle Button -->
+            <button class="btn btn-outline-dark d-md-none me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt text-primary me-2"></i>TheSecureX <span class="text-muted fw-normal fs-6">OEM</span>
+            </a>
+            
+            <div class="ms-auto d-flex align-items-center"> 
+                <div class="d-none d-sm-block me-3 text-end">
+                    <div class="fw-bold small">Global Admin</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">System Administrator</div>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            A
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cogs me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i>Sign out</a></li>
+                    </ul>
+                </div>
+            </div> 
+        </div>
+    </nav> 
+
+    <!-- Mobile Sidebar (Offcanvas) -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel"><i class="fas fa-shield-alt me-2"></i>TheSecureX</h5>
+            <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column sidebar-nav"> 
+                <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a></li> 
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/invites}"><i class="fas fa-envelope-open-text"></i> Invite Management</a></li> 
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-server"></i> System Health</a></li> 
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-list-alt"></i> Global Audit Logs</a></li> 
+                <li class="nav-item mt-3"><div class="text-muted small text-uppercase px-3 mb-1">Settings</div></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-users-cog"></i> User Roles</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-tools"></i> Platform Config</a></li>
+            </ul> 
+        </div>
+    </div>
+
+    <div class="container-fluid"> 
+        <div class="row"> 
+            <!-- Desktop Sidebar -->
+            <nav class="col-md-2 d-none d-md-block sidebar py-4"> 
+                <div class="position-sticky" style="top: 80px;">
+                    <ul class="nav flex-column"> 
+                        <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a></li> 
+                        <li class="nav-item"><a class="nav-link" th:href="@{/oem/trial-requests}">
+                            <i class="fas fa-user-clock"></i> Trial Requests
+                            <span class="badge bg-danger ms-2" th:if="${pendingRequests > 0}" th:text="${pendingRequests}"></span>
+                        </a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/oem/access-groups}"><i class="fas fa-layer-group"></i> Access Groups</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/oem/master-geo}"><i class="fas fa-globe-americas"></i> Master Geo Data</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/invites}"><i class="fas fa-envelope-open-text"></i> Invite Management</a></li> 
+                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-server"></i> System Health</a></li> 
+                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-list-alt"></i> Global Audit Logs</a></li> 
+                        <li class="nav-item mt-4"><div class="text-muted small text-uppercase px-3 mb-2">Settings</div></li>
+                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-users-cog"></i> User Roles</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-tools"></i> Platform Config</a></li>
+                    </ul> 
+                </div>
+            </nav> 
+
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4"> 
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"> 
+                    <h1 class="h2">System Overview</h1> 
+                </div> 
+
+                <div class="row g-4 mb-4"> 
+                    <div class="col-md-3"> 
+                        <div class="card p-3 border-0 shadow-sm position-relative overflow-hidden"> 
+                            <i class="fas fa-search stat-card-icon text-primary"></i>
+                            <small class="text-muted uppercase fw-bold">Active Investigations</small> 
+                            <h2 class="text-primary mt-2">124</h2> 
+                        </div> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <div class="card p-3 border-0 shadow-sm position-relative overflow-hidden"> 
+                            <i class="fas fa-heartbeat stat-card-icon text-success"></i>
+                            <small class="text-muted uppercase fw-bold">Node Status</small> 
+                            <h2 class="text-success mt-2" th:text="${systemHealth}">All Green</h2> 
+                        </div> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <div class="card p-3 border-0 shadow-sm position-relative overflow-hidden"> 
+                            <i class="fas fa-users stat-card-icon text-warning"></i>
+                            <small class="text-muted uppercase fw-bold">Total Users</small> 
+                            <h2 class="text-warning mt-2" th:text="${totalUsers}">14%</h2> 
+                        </div> 
+                    </div> 
+                    <div class="col-md-3"> 
+                        <div class="card p-3 border-0 shadow-sm position-relative overflow-hidden"> 
+                            <i class="fas fa-envelope stat-card-icon text-info"></i>
+                            <small class="text-muted uppercase fw-bold">Pending Invites</small> 
+                            <h2 class="text-info mt-2" th:text="${pendingInvitesCount}">5</h2> 
+                        </div> 
+                    </div> 
+                </div> 
+
+                <!-- Placeholder for more content -->
+                <div class="card mt-4">
+                    <div class="card-header bg-white fw-bold">Recent System Activity</div>
+                    <div class="card-body">
+                        <p class="text-muted">No critical alerts in the last 24 hours.</p>
+                    </div>
+                </div>
+            </main> 
+        </div> 
+    </div> 
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body> 
+</html>

@@ -1,16 +1,15 @@
-# FROM openjdk:17-jdk-slim
-# WORKDIR /app
-# COPY target/portal-gateway-0.0.1-SNAPSHOT.jar app.jar
-# ENTRYPOINT ["java", "-jar", "app.jar"]
-
-# For development (using Maven wrapper if available, or just assumption)
-FROM maven:3.8.5-openjdk-17 AS build
+# Stage 1: Build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk-slim
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/target/portal-gateway-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
+# Create vault directory
+RUN mkdir -p /data/vault
+EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]
