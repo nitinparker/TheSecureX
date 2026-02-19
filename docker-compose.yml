@@ -1,65 +1,65 @@
 version: '3.8'
 
 services:
-  # 1. Java Portal Gateway (Spring Boot)
-  portal-gateway:
-    build: 
-      context: ./portal-gateway
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/securex_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=securex_root
-    depends_on:
-      - db
-    networks:
-      - securex-mesh
-
-  # 2. Python AI Engine (FastAPI)
-  ai-engine:
-    build: 
-      context: ./ai-engine
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:securex_root@db:5432/securex_db
-    depends_on:
-      - db
-    networks:
-      - securex-mesh
-
-  # 3. Go Network Tools (TheNetProtectX)
-  network-tools:
-    build: 
-      context: ./network-tools
-      dockerfile: Dockerfile
-    # Network tools often need host networking or capabilities
-    cap_add:
-      - NET_ADMIN
-    networks:
-      - securex-mesh
-
-  # 4. Database (PostgreSQL)
+  # Persistent Database
   db:
     image: postgres:15
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=securex_root
-      - POSTGRES_DB=securex_db
+      POSTGRES_DB: thesecurex
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: securex_pass
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - securex-mesh
 
-  # 5. Message Broker (RabbitMQ)
-  broker:
-    image: rabbitmq:3-management
+  portal-gateway:
+    build: ./portal-gateway
+    container_name: portal-gateway
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/thesecurex
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: securex_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      EVIDENCE_VAULT_PATH: /data/vault
+    volumes:
+      - ./evidence-vault:/data/vault
+    depends_on:
+      - db
+    networks:
+      - securex-mesh
+
+  ai-engine:
+    build: ./ai-engine
+    container_name: ai-engine
+    ports:
+      - "8000:8000"
+    environment:
+      JAVA_PORTAL_URL: http://portal-gateway:8081/api/tools/verify
+      VAULT_PATH: /data/vault
+    volumes:
+      - ./evidence-vault:/data/vault
+    depends_on:
+      - portal-gateway
+    networks:
+      - securex-mesh
+
+  network-tools:
+    build: ./network-tools
+    container_name: network-tools
+    ports:
+      - "8002:8002"
+    environment:
+      JAVA_PORTAL_URL: http://portal-gateway:8081/api/tools/verify
+      VAULT_PATH: /data/vault
+    volumes:
+      - ./evidence-vault:/data/vault
+    depends_on:
+      - portal-gateway
     networks:
       - securex-mesh
 
@@ -69,3 +69,4 @@ networks:
 
 volumes:
   postgres_data:
+  evidence-vault:

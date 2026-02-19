@@ -27,9 +27,20 @@ public class ToolLaunchController {
     @Autowired
     private ToolRepository toolRepository;
 
+    @Autowired
+    private com.thesecurex.portal.service.UserService userService;
+
     @GetMapping("/tools/launch/{toolId}")
     public String launchTool(@PathVariable Long toolId, Authentication authentication) {
         String username = authentication.getName();
+        
+        // Security Check: Verify user has access to this tool
+        boolean hasAccess = userService.getToolsForUser(username).stream()
+                .anyMatch(t -> t.getId().equals(toolId));
+        
+        if (!hasAccess) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to access this tool.");
+        }
         
         // verify tool exists
         Optional<Tool> toolOpt = toolRepository.findById(toolId);
